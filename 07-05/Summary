@@ -1,0 +1,129 @@
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+
+네임스페이스를 사용하면 편리하다.
+
+<bean id="family" class="com.javalec.ex.Family" c:papaName="흥아빠" c:mamiName="흥엄마" p:sisterName="흥누나">
+		<property name="brotherName" value="흥오빠"/>
+</bean> 이런식으로.
+
+
+xml 파일을 여러개만들수있음.
+
+두개인 경우 location1,2에 받아와서 genericXmlApplication 으로 받아온 다음 getBean으로 추출
+String configLocation1="classpath:applicationCTX.xml";
+		String configLocation2="classpath:applicationCTX1.xml";	
+		AbstractApplicationContext ctx=new GenericXmlApplicationContext(configLocation1,configLocation2);
+		
+		Student student1=ctx.getBean("student1",Student.class);
+		System.out.println(student1.getName());	//홍길동
+		System.out.println(student1.getHobbys());	// 수영, 요리
+		
+		
+		StudentInfo studentInfo = ctx.getBean("studentInfo1",StudentInfo.class);
+		
+		Student student2 = studentInfo.getStudent();	//student1  == student2
+		System.out.println(student2.getName());	//홍길동
+		System.out.println(student2.getHobbys());	// 수영, 요리
+		
+		if(student1.equals(student2)) {
+			System.out.println("student1 == student2");
+		}
+		
+		
+		Student student3=ctx.getBean("student3",Student.class);
+		System.out.println(student3.getName());
+		
+	
+
+xml로 안하고 java로만 하는방법 @Configuration을 사용! 그리고 @Bean 으로 객체생성
+
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class ApplicationConfig {
+
+	
+	@Bean
+	public Student student1(){
+		
+	ArrayList<String> hobbys = new ArrayList<String>();
+	hobbys.add("수영");
+	hobbys.add("요리");
+	
+	Student student = new Student("홍길동", 20, hobbys);
+	student.setHeight(180);
+	student.setWeight(80);
+	
+	return student;
+	
+	}
+	
+
+
+	@Bean
+	public Student student2(){
+		
+		ArrayList<String> hobbys = new ArrayList<String>();
+		hobbys.add("독서");
+		hobbys.add("음악감상");
+		
+		Student student = new Student("홍길순", 18, hobbys);
+		student.setHeight(170);
+		student.setWeight(55);
+		
+		return student;
+	}
+}	
+		if(student1.equals(student3)) {
+			System.out.println("student1 == student3");
+		} else {
+			System.out.println("student1 != student3");
+		}
+		
+		
+		Family family =ctx.getBean("family",Family.class);
+
+
+
+
+
+
+	
+그리고 메인에서 이렇게 받아옴.
+AnnotationConfigApplicationContext ctx=new AnnotationConfigApplicationContext(ApplicationConfig.class);
+	
+
+그리고 둘다 사용하는 방법
+xml파일에 java파일 포함 또는 java파일에 xml파일 포함 사용
+
+xml에 java파일 포함하는 방법
+xmlns:context="http://www.springframework.org/schema/context"
+<context:annotation-config />
+	<bean class="com.javalec.ex.ApplicationConfig"/>
+	
+
+xml 파일에 자바파일을 context:annotation-config 로 함..
+
+자바파일은 @Configuration으로 만들어서 객체생성
+
+AbstractApplicationContext ctx = new GenericXmlApplicationContext("classpath:applicationCTX.xml");
+		Student student1 = ctx.getBean("student1", Student.class); 
+
+불러오는 방법은 xml과 동일
+
+
+
+
+java파일에 xml 파일 포함사용하는 법
+
+xml은 원래대로 사용.
+
+자바파일에서 xml파일을 import함
+@ImportResource("classpath:applicationCTX.xml")
+	
+
+메인에서 불러오는건 자바와 같음
+AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ApplicationConfig.class);
+			
